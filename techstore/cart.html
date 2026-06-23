@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Корзина — TechStore</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚡</span> TechStore</a>
+      <nav class="nav">
+        <a href="index.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="about.html">О нас</a>
+        <a href="contacts.html">Контакты</a>
+      </nav>
+      <div class="header-actions">
+        <a href="cart.html" class="icon-btn">🛒<span class="cart-badge hidden">0</span></a>
+        <button class="menu-toggle">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container section">
+    <div class="breadcrumbs">
+      <a href="index.html">Главная</a><span>/</span>Корзина
+    </div>
+    <h1 class="section-title" style="text-align:left; margin-bottom: 24px;">Корзина</h1>
+    <div id="cart-content"></div>
+  </div>
+
+  <footer class="footer">
+    <div class="container"><div class="footer-bottom">© 2026 TechStore. Все права защищены.</div></div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function renderCart() {
+      const items = Cart.get();
+      const container = document.getElementById('cart-content');
+
+      if (!items.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🛒</div>
+            <h2>Корзина пуста</h2>
+            <p style="margin: 12px 0 24px;">Добавьте товары из каталога</p>
+            <a href="catalog.html" class="btn btn-primary btn-lg">Перейти в каталог</a>
+          </div>`;
+        return;
+      }
+
+      const itemsHtml = items.map(item => {
+        const p = PRODUCTS.find(p => p.id === item.id);
+        if (!p) return '';
+        return `
+          <div class="cart-item">
+            <div class="cart-item-image">${p.icon}</div>
+            <div class="cart-item-info">
+              <div class="product-category">${p.category}</div>
+              <h3>${p.name}</h3>
+              <div class="cart-item-price">${formatPrice(p.price)}</div>
+              <div class="quantity-control">
+                <button class="qty-btn" data-dec="${p.id}">−</button>
+                <span class="qty-value">${item.qty}</span>
+                <button class="qty-btn" data-inc="${p.id}">+</button>
+              </div>
+            </div>
+            <button class="cart-item-remove" data-remove="${p.id}" title="Удалить">✕</button>
+          </div>`;
+      }).join('');
+
+      const total = Cart.total();
+      const delivery = total > 50000 ? 0 : 500;
+      const finalTotal = total + delivery;
+
+      container.innerHTML = `
+        <div class="cart-layout">
+          <div class="cart-items">${itemsHtml}</div>
+          <div class="cart-summary">
+            <h3>Ваш заказ</h3>
+            <div class="summary-row"><span>Товары (${Cart.count()})</span><span>${formatPrice(total)}</span></div>
+            <div class="summary-row"><span>Доставка</span><span>${delivery === 0 ? 'Бесплатно' : formatPrice(delivery)}</span></div>
+            <div class="summary-row total"><span>Итого</span><span>${formatPrice(finalTotal)}</span></div>
+            <a href="checkout.html" class="btn btn-primary btn-block btn-lg" style="margin-top: 20px;">Оформить заказ</a>
+            <button class="btn btn-outline btn-block" id="clear-cart" style="margin-top: 8px;">Очистить корзину</button>
+          </div>
+        </div>`;
+
+      document.getElementById('clear-cart').addEventListener('click', () => {
+        if (confirm('Очистить корзину?')) { Cart.clear(); renderCart(); }
+      });
+    }
+
+    document.addEventListener('click', e => {
+      if (e.target.dataset.inc) { const id = +e.target.dataset.inc; const item = Cart.get().find(i => i.id === id); Cart.updateQty(id, item.qty + 1); renderCart(); }
+      if (e.target.dataset.dec) { const id = +e.target.dataset.dec; const item = Cart.get().find(i => i.id === id); Cart.updateQty(id, item.qty - 1); renderCart(); }
+      if (e.target.dataset.remove) { Cart.remove(+e.target.dataset.remove); renderCart(); }
+    });
+
+    window.addEventListener('cart-updated', renderCart);
+    renderCart();
+  </script>
+</body>
+</html>
