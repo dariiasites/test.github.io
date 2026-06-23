@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Каталог — TechStore</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚡</span> TechStore</a>
+      <nav class="nav">
+        <a href="index.html">Главная</a>
+        <a href="catalog.html" class="active">Каталог</a>
+        <a href="about.html">О нас</a>
+        <a href="contacts.html">Контакты</a>
+      </nav>
+      <div class="header-actions">
+        <a href="cart.html" class="icon-btn">🛒<span class="cart-badge hidden">0</span></a>
+        <button class="menu-toggle">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="breadcrumbs">
+      <a href="index.html">Главная</a><span>/</span>Каталог
+    </div>
+
+    <h1 class="section-title" style="text-align:left; margin-bottom: 24px;">Каталог товаров</h1>
+
+    <div class="catalog-layout">
+      <aside class="filters">
+        <div class="filter-group">
+          <div class="filter-title">🔍 Поиск</div>
+          <input type="text" id="search" class="search-input" placeholder="Название товара...">
+        </div>
+        <div class="filter-group">
+          <div class="filter-title">Категория</div>
+          <div class="filter-options" id="category-filters"></div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-title">Цена, ₽</div>
+          <input type="range" id="price-range" min="0" max="300000" value="300000" style="width:100%; accent-color: var(--primary);">
+          <div style="display:flex; justify-content:space-between; font-size:13px; color: var(--text-soft); margin-top: 4px;">
+            <span>0</span><span id="price-max">300 000</span>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-block" id="reset-filters">Сбросить</button>
+      </aside>
+
+      <div>
+        <div class="catalog-header">
+          <div class="catalog-count" id="catalog-count">Найдено: 0</div>
+          <select class="sort-select" id="sort">
+            <option value="default">По умолчанию</option>
+            <option value="price-asc">Цена: по возрастанию</option>
+            <option value="price-desc">Цена: по убыванию</option>
+            <option value="rating">По рейтингу</option>
+            <option value="name">По названию</option>
+          </select>
+        </div>
+        <div class="products-grid" id="products-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">© 2026 TechStore. Все права защищены.</div>
+    </div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const state = { search: '', categories: [], maxPrice: 300000, sort: 'default' };
+
+    // Рендер категорий
+    const catContainer = document.getElementById('category-filters');
+    catContainer.innerHTML = CATEGORIES.map(c => `
+      <label class="filter-option">
+        <input type="checkbox" value="${c}" class="cat-filter"> ${c}
+      </label>
+    `).join('');
+
+    function applyFilters() {
+      let list = PRODUCTS.filter(p => {
+        if (state.search && !p.name.toLowerCase().includes(state.search.toLowerCase())) return false;
+        if (state.categories.length && !state.categories.includes(p.category)) return false;
+        if (p.price > state.maxPrice) return false;
+        return true;
+      });
+
+      switch (state.sort) {
+        case 'price-asc': list.sort((a,b) => a.price - b.price); break;
+        case 'price-desc': list.sort((a,b) => b.price - a.price); break;
+        case 'rating': list.sort((a,b) => b.rating - a.rating); break;
+        case 'name': list.sort((a,b) => a.name.localeCompare(b.name)); break;
+      }
+
+      const grid = document.getElementById('products-grid');
+      document.getElementById('catalog-count').textContent = `Найдено: ${list.length}`;
+      if (!list.length) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon">🔍</div><h3>Ничего не найдено</h3><p>Попробуйте изменить параметры поиска</p></div>`;
+      } else {
+        grid.innerHTML = list.map(renderProductCard).join('');
+      }
+    }
+
+    document.getElementById('search').addEventListener('input', e => { state.search = e.target.value; applyFilters(); });
+    document.querySelectorAll('.cat-filter').forEach(cb => cb.addEventListener('change', () => {
+      state.categories = [...document.querySelectorAll('.cat-filter:checked')].map(c => c.value);
+      applyFilters();
+    }));
+    document.getElementById('price-range').addEventListener('input', e => {
+      state.maxPrice = +e.target.value;
+      document.getElementById('price-max').textContent = formatPrice(state.maxPrice);
+      applyFilters();
+    });
+    document.getElementById('sort').addEventListener('change', e => { state.sort = e.target.value; applyFilters(); });
+    document.getElementById('reset-filters').addEventListener('click', () => {
+      state.search = ''; state.categories = []; state.maxPrice = 300000; state.sort = 'default';
+      document.getElementById('search').value = '';
+      document.querySelectorAll('.cat-filter').forEach(c => c.checked = false);
+      document.getElementById('price-range').value = 300000;
+      document.getElementById('price-max').textContent = '300 000 ₽';
+      document.getElementById('sort').value = 'default';
+      applyFilters();
+    });
+
+    applyFilters();
+  </script>
+</body>
+</html>
