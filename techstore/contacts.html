@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Контакты — TechStore</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚡</span> TechStore</a>
+      <nav class="nav">
+        <a href="index.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="about.html">О нас</a>
+        <a href="contacts.html" class="active">Контакты</a>
+      </nav>
+      <div class="header-actions">
+        <a href="cart.html" class="icon-btn">🛒<span class="cart-badge hidden">0</span></a>
+        <button class="menu-toggle">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container section">
+    <h1 class="section-title" style="text-align:left;">Контакты</h1>
+    <p class="section-subtitle" style="text-align:left;">Мы всегда на связи</p>
+
+    <div class="contacts-grid">
+      <div class="contact-info">
+        <h2 style="margin-bottom: 16px;">Свяжитесь с нами</h2>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div><h4>Телефон</h4><p>8 (800) 555-35-35 (бесплатно по РФ)</p></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div><h4>Email</h4><p>info@techstore.ru</p></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div><h4>Адрес</h4><p>Москва, ул. Тверская, 1, офис 305</p></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🕐</div>
+          <div><h4>Режим работы</h4><p>Пн-Пт: 9:00 — 21:00<br>Сб-Вс: 10:00 — 20:00</p></div>
+        </div>
+      </div>
+
+      <form class="contact-info" id="contact-form">
+        <h2 style="margin-bottom: 16px;">Напишите нам</h2>
+        <div class="form-group"><label class="form-label">Ваше имя</label><input class="form-input" name="name" required></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" name="email" required></div>
+        <div class="form-group"><label class="form-label">Тема</label><input class="form-input" name="subject"></div>
+        <div class="form-group"><label class="form-label">Сообщение</label><textarea class="form-textarea" name="message" required></textarea></div>
+        <button type="submit" class="btn btn-primary btn-block">Отправить сообщение</button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container"><div class="footer-bottom">© 2026 TechStore. Все права защищены.</div></div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById('contact-form').addEventListener('submit', e => {
+      e.preventDefault();
+      showToast('Сообщение отправлено! Мы свяжемся с вами в ближайшее время.');
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>
