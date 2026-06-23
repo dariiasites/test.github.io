@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Товар — TechStore</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚡</span> TechStore</a>
+      <nav class="nav">
+        <a href="index.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="about.html">О нас</a>
+        <a href="contacts.html">Контакты</a>
+      </nav>
+      <div class="header-actions">
+        <a href="cart.html" class="icon-btn">🛒<span class="cart-badge hidden">0</span></a>
+        <button class="menu-toggle">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="breadcrumbs">
+      <a href="index.html">Главная</a><span>/</span>
+      <a href="catalog.html">Каталог</a><span>/</span>
+      <span id="bc-name">Товар</span>
+    </div>
+
+    <div id="product-container"></div>
+
+    <section class="section">
+      <h2 class="section-title" style="text-align:left;">Похожие товары</h2>
+      <div class="products-grid" id="related-products" style="margin-top: 24px;"></div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">© 2026 TechStore. Все права защищены.</div>
+    </div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const id = parseInt(new URLSearchParams(location.search).get('id'));
+    const product = PRODUCTS.find(p => p.id === id);
+
+    if (!product) {
+      document.getElementById('product-container').innerHTML = `<div class="empty-state"><div class="empty-state-icon">😕</div><h2>Товар не найден</h2><a href="catalog.html" class="btn btn-primary" style="margin-top:16px;">Вернуться в каталог</a></div>`;
+    } else {
+      document.title = `${product.name} — TechStore`;
+      document.getElementById('bc-name').textContent = product.name;
+
+      const specs = Object.entries(product.specs).map(([k,v]) => `<li><span class="spec-label">${k}</span><span class="spec-value">${v}</span></li>`).join('');
+      const oldPrice = product.oldPrice ? `<span class="product-price-old" style="font-size:20px;">${formatPrice(product.oldPrice)}</span>` : '';
+
+      document.getElementById('product-container').innerHTML = `
+        <div class="product-page">
+          <div class="product-gallery">${product.icon}</div>
+          <div class="product-details">
+            <div class="product-category">${product.category}</div>
+            <h1>${product.name}</h1>
+            ${renderRating(product.rating, product.reviews)}
+            <p class="product-description">${product.description}</p>
+            <div class="product-price-big">${formatPrice(product.price)} ${oldPrice}</div>
+            <div class="product-actions">
+              <button class="btn btn-primary btn-lg" data-add="${product.id}">🛒 В корзину</button>
+              <a href="cart.html" class="btn btn-outline btn-lg">Перейти в корзину</a>
+            </div>
+          </div>
+        </div>
+        <div class="product-specs">
+          <h2 style="margin-bottom: 16px;">Характеристики</h2>
+          <ul class="specs-list">${specs}</ul>
+        </div>
+      `;
+
+      const related = PRODUCTS.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+      document.getElementById('related-products').innerHTML = related.map(renderProductCard).join('');
+    }
+  </script>
+</body>
+</html>
